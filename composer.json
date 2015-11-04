@@ -1,0 +1,22 @@
+{
+    "name": "bnchdrff/drupal-restroom",
+    "description": "Services API helpers borrowed from commerce_services",
+    "keywords": ["drupal"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Benjamin Chodoroff",
+            "email": "anonyben@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bnchdrff\\DrupalRestroom\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
