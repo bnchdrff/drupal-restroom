@@ -44,6 +44,57 @@ class Helpers {
     // Loop over every field instance on the given entity.
     foreach (field_info_instances($entity_type, $bundle) as $field_name => $instance) {
       $field_info = field_info_field($field_name);
+
+      // Add file & image URLs.
+      if (in_array($field_info['type'], array('file', 'image'))) {
+        $url_field_name = $field_name . '_url';
+
+        // Set the URL for a single value field.
+        if ($field_info['cardinality'] == 1) {
+          $field_value = $clone_wrapper->{$field_name}->raw();
+          $cloned_entity->{$url_field_name} = '';
+          $url = NULL;
+
+          // If the field value contains a URI...
+          if (!empty($field_value['uri'])) {
+            // And we can generate a URL to the file at that URI...
+            $url = file_create_url($field_value['uri']);
+
+            if (!empty($url)) {
+              // Add it to the entity using the URL field name.
+              $cloned_entity->{$url_field_name} = $url;
+            }
+          }
+        }
+        else {
+          // Otherwise loop over the field and generate each URL.
+          $cloned_entity->{$url_field_name} = array();
+
+          foreach ($clone_wrapper->{$field_name}->getIterator() as $delta => $field_wrapper) {
+            $field_value = $field_wrapper->raw();
+            $url = NULL;
+
+            // If the field value contains a URI...
+            if (!empty($field_value['uri'])) {
+              // And we can generate a URL to the file at that URI...
+              $url = file_create_url($field_value['uri']);
+
+              if (!empty($url)) {
+                // Add it to the entity using the URL field name.
+                $cloned_entity->{$url_field_name}[$delta] = $url;
+              }
+            }
+
+            // If the field value did not have a URI or the URL to the file could not
+            // be determined, add an empty URL string to the entity.
+            if (empty($url)) {
+              $cloned_entity->{$url_field_name}[$delta] = '';
+            }
+          }
+        }
+      }
+
+      $field_info = field_info_field($field_name);
       // Add file & image URLs.
       if (in_array($field_info['type'], array('file', 'image'))) {
         $url_field_name = $field_name . '_url';
